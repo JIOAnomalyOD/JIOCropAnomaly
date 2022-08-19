@@ -15,9 +15,9 @@ import numpy as np
 from object_detection.utils import label_map_util
 label_map_util.tf = tf.compat.v1
 tf.gfile = tf.io.gfile
-from object_detection.utils import visualization_utils as viz_utils
+#from object_detection.utils import visualization_utils as viz_utils
+import vis
 import matplotlib.pyplot as plt
-import collections
 #import tensorflow.compat.v1 as tf
 #tf.disable_v2_behavior()
 #try:
@@ -40,6 +40,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 PATH_TO_SAVED_MODEL = "/saved_model"
 app.secret_key = 'MIMGD Group'
 
+# Load saved model and build the detection function
+detect_fn = tf.saved_model.load('saved_model')
+
 
 # tf object detection function
 def detect_object(uploaded_image_path):
@@ -52,9 +55,8 @@ def detect_object(uploaded_image_path):
     # The model expects a batch of images, so add an axis with `tf.newaxis`.
     input_tensor = input_tensor[tf.newaxis, ...]
     # input_tensor = np.expand_dims(image_np, 0)
-    # Load saved model and build the detection function
-    detect_fn = tf.saved_model.load('saved_model')
     detections = detect_fn(input_tensor)
+
 
     # All outputs are batches tensors.
     # Convert to numpy arrays, and take index [0] to remove the batch dimension.
@@ -74,7 +76,7 @@ def detect_object(uploaded_image_path):
     #PATH_TO_LABELS = os.path.join('saved_model', 'annotation.pbtxt')
     category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
-    viz_utils.visualize_boxes_and_labels_on_image_array(
+    vis.visualize_boxes_and_labels_on_image_array1(
         image_np_with_detections,
         detections['detection_boxes'],
         detections['detection_classes'],
@@ -145,8 +147,8 @@ def add_header(response):
     return response
 
 
-#if __name__ == '__main__':
-    #app.run(debug=True)
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=8080)
+    app.run(debug=True)
+
+#if __name__ == '__main__':
+    #app.run(host='0.0.0.0',port=8080)
